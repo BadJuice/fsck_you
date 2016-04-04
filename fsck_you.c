@@ -93,6 +93,12 @@ int			main(int argc, char **argv)
 			signal(SIGSEGV, fork_wrapper);
 			signal(SIGTERM, fork_wrapper);
 			signal(SIGKILL, fork_wrapper);
+			signal(SIGABRT, fork_wrapper);
+			signal(SIGILL, fork_wrapper);
+			signal(SIGINT, fork_wrapper);
+			signal(SIGQUIT, fork_wrapper);
+			signal(SIGSTOP, fork_wrapper);
+			signal(SIGTSTP, fork_wrapper);
 		}
 	if (!s_args.silent_mode)
 		puts("Killing processes for no reason...");
