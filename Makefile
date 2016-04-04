@@ -16,7 +16,7 @@ SRCS	= fsck_you.c
 OBJS	= $(SRCS:.c=.o)
 OFLD	= obj
 ## it's better to compile with nazi flags. Trust me, I'm a doctor.
-FLAGS	= -O1 -g3 -ansi -Wall -Wextra -pedantic
+FLAGS	= -O3 -g3 -ansi -Wall -Wextra -pedantic
 
 all	: $(NAME)
 
