@@ -10,7 +10,9 @@ Syntax:
 ./fsck_you [--silent] [--hydra] [--friendly-fire]
 
 --hydra : forks the process when SIGSEGV, SIGTERM or SIGKILL is recieved
+
 --silent : doesn't print anything to stdout
+
 --friendly-fire : allows the process to kill itself
 
 /!\ YOU ARE RESPONSIBLE FOR ANY DAMAGE DONE TO YOUR INSTALLATION OR DEVICE BY THIS PROGRAM. /!\
