@@ -5,7 +5,7 @@
 ** login	<thomasmurgi@hotmail.fr>
 **
 ** Started on Sun Apr 03 22:58:30 2016 Thomas Murgia
-** Last update Mon Apr 04 10:22:15 2016 Thomas Murgia
+** Last update Mon Apr 04 10:30:08 2016 Thomas Murgia
 */
 
 #include		<sys/types.h>
@@ -50,11 +50,13 @@ int			main(int argc, char **argv)
 	if (argc == 2 && !strcmp(argv[1], "--silent"))
 		silent = 1;
 	srand(time(NULL));
-	puts("Killing processes for no reason...");
+	if (!silent)
+		puts("Killing processes for no reason...");
 	while (1)
 		{
 			while ((randpid = gen_rand_pid()) == getpid());
-			printf("Attempting to kill PID=%d\n", randpid);
+			if (!silent)
+				printf("Attempting to kill PID=%d\n", randpid);
 			if ((kill(randpid, SIGSEGV) != 0) && !silent)
 				puts("Failed :(");
 			else if (!silent)
