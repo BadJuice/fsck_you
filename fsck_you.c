@@ -60,6 +60,8 @@ int			gen_rand_pid(void)
 	file = fopen("/dev/urandom", "r");
 	fread(&rand_val, sizeof(int), 1, file);
 	fclose(file);
+	if (rand_val < 0)
+		rand_val *= -1;
 	return (rand_val % get_max_pid()) + 1;
 }
 
