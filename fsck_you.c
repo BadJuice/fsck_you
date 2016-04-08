@@ -54,9 +54,9 @@ void			check_args(const int argc, char **argv, struct t_arg *s_args)
 		}
 }
 
-int			get_max_pid(void)
+unsigned int		get_max_pid(void)
 {
-        int		max_pid;
+        unsigned int	max_pid;
         FILE            *file;
 
         file = fopen("/proc/sys/kernel/pid_max", "r");
@@ -66,22 +66,20 @@ int			get_max_pid(void)
         return max_pid;
 }
 
-int			gen_rand_pid(void)
+unsigned int		gen_rand_pid(void)
 {
-	int		rand_val;
+	unsigned int	rand_val;
 	FILE		*file;
 
 	file = fopen("/dev/urandom", "r");
 	fread(&rand_val, sizeof(int), 1, file);
 	fclose(file);
-	if (rand_val < 0)
-		rand_val *= -1;
 	return (rand_val % get_max_pid()) + 1;
 }
 
 int			main(int argc, char **argv)
 {
-	int		randpid;
+	unsigned int	randpid;
 	struct t_arg	s_args;
 
 	randpid = 0;
