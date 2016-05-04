@@ -12,13 +12,13 @@ CC	= gcc
 RM	= rm -rf
 NAME	= fsck_you
 SRCS	= source/fsck_you.c
-OBJS	= $(SRCS:.c=.o).
+OBJS	= $(SRCS:.c=.o)
 CFLAGS	= -O2 -g3 -ansi -Wall -Wextra -Werror -pedantic -std=c99
 
 all	: $(NAME)
 
 $(NAME)	: $(OBJS)
-	  $(CC) -o $(NAME) $(SRCS) $(CFLAGS)
+	  $(CC) -o $(NAME) $(OBJS) $(CFLAGS)
 
 clean	:
 	  $(RM) $(OBJS)

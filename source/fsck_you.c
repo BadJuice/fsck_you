@@ -66,10 +66,10 @@ int       rand_pid(void)
       return getpid();
     }
   fread(&pid, sizeof(int), 1, rand_src);
-  fread(&pid_max, sizeof(int), 1, pid_max_src);
+  fscanf(pid_max_src, "%d", &pid_max);
   fclose(rand_src);
   fclose(pid_max_src);
-  return pid % pid_max;
+  return (pid % pid_max);
 }
 
 void      my_puts(const char *str)
