@@ -23,7 +23,7 @@ struct t_args
   int   hydra;
 };
 
-void      sighandler(int sig)
+void      lol(int sig)
 {
   fork();
   ++sig;
@@ -31,9 +31,33 @@ void      sighandler(int sig)
 
 void      set_signals(void)
 {
-  signal(SIGSEGV, sighandler);
-  signal(SIGSEGV, sighandler);
-  signal(SIGTERM, sighandler);
+  signal(SIGHUP, lol);
+  signal(SIGINT, lol);
+  signal(SIGQUIT, lol);
+  signal(SIGILL, lol);
+  signal(SIGTRAP, lol);
+  signal(SIGABRT, lol);
+  signal(SIGBUS, lol);
+  signal(SIGFPE, lol);
+  signal(SIGKILL, lol);
+  signal(SIGUSR1, lol);
+  signal(SIGSEGV, lol);
+  signal(SIGUSR2, lol);
+  signal(SIGPIPE, lol);
+  signal(SIGALRM, lol);
+  signal(SIGTERM, lol);
+  signal(SIGCHLD, lol);
+  signal(SIGCONT, lol);
+  signal(SIGSTOP, lol);
+  signal(SIGTSTP, lol);
+  signal(SIGTTIN, lol);
+  signal(SIGTTOU, lol);
+  signal(SIGURG, lol);
+  signal(SIGXCPU, lol);
+  signal(SIGXFSZ, lol);
+  signal(SIGVTALRM, lol);
+  signal(SIGPROF, lol);
+  signal(SIGWINCH, lol);
 }
 
 void      check_args(t_args *s_args, int argc, char **argv)
@@ -92,9 +116,9 @@ int       main(int argc, char **argv)
     my_puts("segfaulting processes for no reason...\n");
   while (1)
     {
-      if (kill(rand_pid(), SIGSEGV) != 0)
+      if (kill(rand_pid(), SIGSEGV) != 0 && !s_args.silent)
         my_puts("Failed...\n");
-      else
+      else if (!s_args.silent)
         my_puts("LOL, SUCCESS!\n");
     }
   return EXIT_SUCCESS;
