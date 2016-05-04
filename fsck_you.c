@@ -1,114 +1,101 @@
 /*
-** fsck_you.c
-**
-** by Thomas Murgia
-** login	<thomasmurgi@hotmail.fr>
-**
-** Started on Sun Apr 03 22:58:30 2016 Thomas Murgia
-** Last update Mon Apr 04 17:05:20 2016 Thomas Murgia
+** fsck_you.c for fsck_you in /home/admin/Documents/Programming/fsck_you
+** 
+** Made by Thomas Murgia
+** Login   <Garuda1@hotmail.fr>
+** 
+** Started on  Wed May 04 21:52:44 2016 Thomas Murgia
+** Last update Wed May 04 21:52:44 2016 Thomas Murgia
 */
 
-#include		<sys/types.h>
-#include		<unistd.h>
-#include		<signal.h>
-#include		<stdlib.h>
-#include		<stdint.h>
-#include		<string.h>
-#include		<stdio.h>
-#include		<time.h>
+#define   _POSIX_SOURCE
+#include  <sys/types.h>
+#include  <string.h>
+#include  <unistd.h>
+#include  <signal.h>
+#include  <stdlib.h>
+#include  <stdio.h>
 
-struct			t_arg
+typedef struct t_args t_args;
+struct t_args
 {
-	int		silent_mode;
-	int		hydra;
-	int		friendly_fire;
+  int   silent;
+  int   hydra;
 };
 
-void			*fork_wrapper(void)
+void      sighandler(int sig)
 {
-	fork();
-	return NULL;
+  fork();
+  ++sig;
 }
 
-void			init_args(struct t_arg *s_arg)
+void      set_signals(void)
 {
-	s_arg->silent_mode = 0;
-	s_arg->hydra = 0;
-	s_arg->friendly_fire = 0;
+  signal(SIGSEGV, sighandler);
+  signal(SIGSEGV, sighandler);
+  signal(SIGTERM, sighandler);
 }
 
-void			check_args(const int argc, char **argv, struct t_arg *s_args)
+void      check_args(t_args *s_args, int argc, char **argv)
 {
-	int		i;
+  int     i;
 
-	i = 0;
-	while (i != (argc - 1))
-		{
-			if (!strcmp(argv[i + 1], "--silent"))
-				s_args->silent_mode = 1;
-			else if (!strcmp(argv[i +1], "--hydra"))
-				s_args->hydra = 1;
-			else if (!strcmp(argv[i + 1], "--friendly-fire"))
-				s_args->friendly_fire = 1;
-			++i;
-		}
+  i = 1;
+  while (i != argc)
+    {
+      if (!strcmp(argv[i], "--hydra"))
+        s_args -> hydra = 1;
+      else if (!strcmp(argv[i], "--silent"))
+        s_args -> silent = 1;
+      ++i;
+    }
 }
 
-unsigned int		get_max_pid(void)
+int       rand_pid(void)
 {
-        unsigned int	max_pid;
-        FILE            *file;
+  FILE    *rand_src;
+  FILE    *pid_max_src;
+  int     pid;
+  int     pid_max;
 
-        file = fopen("/proc/sys/kernel/pid_max", "r");
-        fscanf(file, "%d", &max_pid);
-        fclose(file);
-
-        return max_pid;
+  if ((rand_src = fopen("/dev/urandom", "r")) == NULL)
+    return getpid();
+  if ((pid_max_src = fopen("/proc/sys/kernel/pid_max", "r")) == NULL)
+    {
+      fclose(rand_src);
+      return getpid();
+    }
+  fread(&pid, sizeof(int), 1, rand_src);
+  fread(&pid_max, sizeof(int), 1, pid_max_src);
+  fclose(rand_src);
+  fclose(pid_max_src);
+  return pid % pid_max;
 }
 
-unsigned int		gen_rand_pid(void)
+void      my_puts(const char *str)
 {
-	unsigned int	rand_val;
-	FILE		*file;
+  int     i;
 
-	file = fopen("/dev/urandom", "r");
-	fread(&rand_val, sizeof(int), 1, file);
-	fclose(file);
-	return (rand_val % get_max_pid()) + 1;
+  i = 0;
+  while (str[i])
+    write(1, &(str[i++]), 1);
 }
 
-int			main(int argc, char **argv)
+int       main(int argc, char **argv)
 {
-	unsigned int	randpid;
-	struct t_arg	s_args;
+  t_args  s_args;
 
-	randpid = 0;
-	init_args(&s_args);
-	check_args(argc, argv, &s_args);
-	srand(time(NULL));
-	if (s_args.hydra)
-		{
-			signal(SIGSEGV, fork_wrapper);
-			signal(SIGTERM, fork_wrapper);
-			signal(SIGKILL, fork_wrapper);
-			signal(SIGABRT, fork_wrapper);
-			signal(SIGILL, fork_wrapper);
-			signal(SIGINT, fork_wrapper);
-			signal(SIGQUIT, fork_wrapper);
-			signal(SIGSTOP, fork_wrapper);
-			signal(SIGTSTP, fork_wrapper);
-		}
-	if (!s_args.silent_mode)
-		puts("Killing processes for no reason...");
-	while (1)
-		{
-			while ((randpid = gen_rand_pid()) == getpid() && !s_args.friendly_fire);
-			if (!s_args.silent_mode)
-				printf("Attempting to kill PID=%d\n", randpid);
-			if ((kill(randpid, SIGSEGV) != 0) && !s_args.silent_mode)
-				puts("Failed :(");
-			else if (!s_args.silent_mode)
-				printf("SUCCESSFULLY KILLED PID=%d, YAY!\n", randpid);
-		}
-	return EXIT_SUCCESS;
+  check_args(&s_args, argc, argv);
+  if (s_args.hydra)
+    set_signals();
+  if (!s_args.silent)
+    my_puts("segfaulting processes for no reason...\n");
+  while (1)
+    {
+      if (kill(rand_pid(), SIGSEGV) != 0)
+        my_puts("Failed...\n");
+      else
+        my_puts("LOL, SUCCESS!\n");
+    }
+  return EXIT_SUCCESS;
 }
