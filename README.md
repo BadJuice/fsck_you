@@ -1,5 +1,5 @@
 # fsck_you
-Ruin you Linux systems with this program!
+Ruin your Linux systems with this program!
 
 fsck_you is a C program, aimed at Linux users who want to torment their poor victims.
 It works by sending SIGSEGV signals to random PIDs (within the kernel limits) until you
