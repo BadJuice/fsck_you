@@ -17,6 +17,7 @@
 #include  <signal.h>
 #include  <string.h>
 #include  <fcntl.h>
+#include  <stdio.h>
 
 typedef struct t_args t_args;
 struct t_args
@@ -61,16 +62,16 @@ void      init_args(t_args *s_args)
 int       rand_pid(void)
 {
   int     rand_src;
-  int     pid_max_src;
+  FILE    *pid_max_src;
   int     pid;
   int     pid_max;
 
+  pid_max_src = fopen(MAX_PID, "r");
   rand_src = open(RAND_SRC, O_RDONLY);
-  pid_max_src = open(MAX_PID, O_RDONLY);
   read(rand_src, &pid, sizeof(int));
-  read(pid_max_src, &pid_max, sizeof(int));
+  fscanf(pid_max_src, "%d", &pid_max);
   close(rand_src);
-  close(pid_max_src);
+  fclose(pid_max_src);
   return (pid % pid_max);
 }
 
