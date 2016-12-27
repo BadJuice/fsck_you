@@ -6,9 +6,9 @@ It works by sending SIGSEGV signals to random PIDs (within the kernel limits) un
 somehow stop it.
 
 Syntax:
-
+```
 ./fsck_you [--silent] [--hydra] [--friendly-fire]
-
+```
 --hydra : forks the process when SIGSEGV, SIGTERM or SIGKILL is recieved
 
 --silent : doesn't print anything to stdout
